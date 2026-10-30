@@ -1,0 +1,61 @@
+name: Publish digest preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      include_marker:
+        description: Include the lane marker (disable only after review and approval)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Install dependencies
+        run: |
+          npm install --global pnpm@11.25.0
+          pnpm install --lockfile=false
+      - run: pnpm test
+      - run: pnpm typecheck
+      - name: Render static preview
+        env:
+          INCLUDE_MARKER: ${{ inputs.include_marker }}
+          LANE_MARKER: ${{ inputs.include_marker && secrets.LANE_MARKER || '' }}
+        run: |
+          node --import tsx --input-type=module <<'NODE'
+          import { mkdir, writeFile } from 'node:fs/promises';
+          import { join } from 'node:path';
+          import { createApp } from './src/app.tsx';
+
+          if (process.env.INCLUDE_MARKER === 'true' && !process.env.LANE_MARKER?.trim()) {
+            throw new Error('LANE_MARKER is required when include_marker is true');
+          }
+          const response = await createApp().request('/digest/2026-10-28');
+          if (response.status !== 200) {
+            throw new Error(`Preview render failed: HTTP ${response.status}`);
+          }
+          const directory = join(process.env.RUNNER_TEMP, 'rig-preview');
+          await mkdir(directory, { recursive: true });
+          await writeFile(join(directory, 'index.html'), await response.text());
+          NODE
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/rig-preview
+      - uses: actions/deploy-pages@v4
+        id: deployment
