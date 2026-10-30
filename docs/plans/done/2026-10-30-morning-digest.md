@@ -1,6 +1,6 @@
 ---
 plan: morning-digest
-status: ready
+status: done
 owner: rook
 opened: 2026-10-29
 ---
@@ -77,3 +77,16 @@ page again with `LANE_MARKER` unset (the banner reads "no marker set") and uploa
 link. Move this plan to `docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
+
+## Issues
+
+| # | Issue | Blocked by |
+|---|-------|------------|
+| 1 | [Digest contract: shared types and reader signature](https://github.com/phondra-alle/mega-s01e04-rig/issues/1) | — |
+| 2 | [Run log reader and reader tests](https://github.com/phondra-alle/mega-s01e04-rig/issues/2) | #1 |
+| 3 | [Digest page: GET /digest/:night](https://github.com/phondra-alle/mega-s01e04-rig/issues/3) | #1 |
+| 4 | [Digest JSON: GET /api/digest/:night](https://github.com/phondra-alle/mega-s01e04-rig/issues/4) | #1 |
+| 5 | [Status board: link nights to their digests](https://github.com/phondra-alle/mega-s01e04-rig/issues/5) | #1 |
+| 6 | [Digest route tests](https://github.com/phondra-alle/mega-s01e04-rig/issues/6) | #1 |
+| 7 | [Public HTML preview for review](https://github.com/phondra-alle/mega-s01e04-rig/issues/7) | #2, #3, #4, #5, #6 |
+| 8 | [Remove preview marker and archive the plan](https://github.com/phondra-alle/mega-s01e04-rig/issues/8) | #7 |
